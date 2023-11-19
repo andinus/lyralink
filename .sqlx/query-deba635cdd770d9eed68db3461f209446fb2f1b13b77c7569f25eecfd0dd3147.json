@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT short_url FROM lyralink WHERE long_url = $1;",
+  "describe": {
+    "columns": [
+      {
+        "name": "short_url",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "deba635cdd770d9eed68db3461f209446fb2f1b13b77c7569f25eecfd0dd3147"
+}

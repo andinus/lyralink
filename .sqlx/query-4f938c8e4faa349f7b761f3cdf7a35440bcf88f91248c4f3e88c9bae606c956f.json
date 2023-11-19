@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO lyralink (short_url, long_url) VALUES ($1, $2);",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "4f938c8e4faa349f7b761f3cdf7a35440bcf88f91248c4f3e88c9bae606c956f"
+}
