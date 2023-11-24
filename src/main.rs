@@ -1,13 +1,9 @@
-use std::net::SocketAddr;
 use axum::{
     routing::{get, post},
     Router,
 };
-use sqlx::{
-    Sqlite,
-    SqlitePool,
-    migrate::MigrateDatabase
-};
+use sqlx::{migrate::MigrateDatabase, Sqlite, SqlitePool};
+use std::net::SocketAddr;
 
 mod controllers;
 use crate::controllers::short_url;
@@ -23,15 +19,10 @@ async fn main() {
             .expect("create sqlite db");
     }
 
-    // connect to the database & run migrations.
+    // connect to the database.
     let pool = SqlitePool::connect(DB_URL)
         .await
-        .expect(&format!("connect to sqlite db: {}", DB_URL));
-
-    // sqlx::migrate!("migrations")
-    //     .run(&pool)
-    //     .await
-    //     .expect("run db migrations");
+        .unwrap_or_else(|_| panic!("connect to sqlite db: {}", DB_URL));
 
     // define routes & start axum server.
     let app = Router::new()
@@ -39,7 +30,7 @@ async fn main() {
         .route("/:link", get(short_url::resolve))
         .with_state(pool);
 
-    let addr = SocketAddr::from(([127, 0 , 0, 1], 8000));
+    let addr = SocketAddr::from(([127, 0, 0, 1], 8000));
     println!("listening on {}", addr);
 
     axum::Server::bind(&addr)
