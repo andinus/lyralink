@@ -55,7 +55,11 @@ pub async fn shorten(
 /// Handles GET request to resolve a short url, client is redirected if we
 /// have the original url, if not then 404 is returned.
 pub async fn resolve(State(pool): State<SqlitePool>, Path(link): Path<String>) -> Response {
-    match sqlx::query!("SELECT long_url FROM lyralink WHERE short_url = $1;", link)
+    // URLs are valid for 24 hours only.
+    match sqlx::query!(
+        "SELECT long_url FROM lyralink WHERE short_url = $1 AND date('now', '-1 days') < created_at;",
+        link
+    )
         .fetch_one(&pool)
         .await
     {
