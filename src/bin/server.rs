@@ -25,7 +25,7 @@ async fn main() {
         .layer(CompressionLayer::new())
         .with_state(pool);
 
-    let addr = SocketAddr::from(([0, 0, 0, 0], 8000));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 12032));
     println!("listening on {}", addr);
 
     axum::Server::bind(&addr)
