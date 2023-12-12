@@ -2,7 +2,7 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use sqlx::{migrate::MigrateDatabase, Sqlite, SqlitePool};
+use sqlx::SqlitePool;
 use std::net::SocketAddr;
 use tower_http::compression::CompressionLayer;
 use tower_http::services::ServeDir;

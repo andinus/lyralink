@@ -1,5 +1,5 @@
-use sqlx::{migrate::MigrateDatabase, Sqlite, SqlitePool};
 use lyralink::DB_URL;
+use sqlx::{migrate::MigrateDatabase, Sqlite, SqlitePool};
 
 /// run database migrations, creates the database if it does not exist.
 #[tokio::main]
@@ -23,7 +23,7 @@ async fn main() {
         .unwrap_or_else(|_| panic!("running sqlx migrations: {}", DB_URL));
 
     // close the connection.
-    pool.close();
+    pool.close().await;
 
     println!("done!");
 }
