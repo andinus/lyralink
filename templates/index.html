@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style>
+ #lyralink-form {
+     display: flex;
+     flex-wrap: wrap;
+     align-items: center;
+     gap: 10px;
+ }
+ #lyralink-form #url {
+     flex-grow: 4;
+     flex-basis: 400px;
+ }
+ #lyralink-form #submit {
+     flex-grow: 1;
+     flex-basis: 40px;
+     margin-bottom: 0;
+ }
+</style>
+{% endblock %}
+
+{% block body %}
+<h1>lyralink - url shortener</h1>
+
+<p>Short links may stop working after 24 hours.</p>
+<pre>
+curl -d "url=https://example.com" {{ crate::BASE_URL }}
+</pre>
+
+<form method="POST" action="/">
+    <div id="lyralink-form">
+        <input type="text" id="url" name="url" placeholder="https://example.com">
+        <button type="submit" id="submit" name="submit">Shorten!</button>
+    </div>
+</form>
+{% endblock %}

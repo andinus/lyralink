@@ -4,11 +4,14 @@ use axum::{
 };
 use sqlx::{migrate::MigrateDatabase, Sqlite, SqlitePool};
 use std::net::SocketAddr;
+use tower_http::compression::CompressionLayer;
+use tower_http::services::ServeDir;
 
-mod controllers;
-use crate::controllers::short_url;
+mod handlers;
+mod utils;
 
 const DB_URL: &str = "sqlite://lyralink.db";
+const BASE_URL: &str = "https://ll.unfla.me";
 
 #[tokio::main]
 async fn main() {
@@ -26,11 +29,14 @@ async fn main() {
 
     // define routes & start axum server.
     let app = Router::new()
-        .route("/", post(short_url::create))
-        .route("/:link", get(short_url::resolve))
+        .route("/", get(handlers::index))
+        .route("/", post(handlers::shorten))
+        .route("/:link", get(handlers::resolve))
+        .nest_service("/resources", ServeDir::new("resources/public"))
+        .layer(CompressionLayer::new())
         .with_state(pool);
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 8000));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 8000));
     println!("listening on {}", addr);
 
     axum::Server::bind(&addr)
