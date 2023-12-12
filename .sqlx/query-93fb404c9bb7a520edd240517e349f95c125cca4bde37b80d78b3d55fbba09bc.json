@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT long_url FROM lyralink WHERE short_url = $1;",
+  "query": "SELECT long_url FROM lyralink WHERE short_url = $1 AND date('now', '-1 days') < created_at;",
   "describe": {
     "columns": [
       {
@@ -16,5 +16,5 @@
       false
     ]
   },
-  "hash": "1711f8617ec9ff1abb95ca44620b8da58496f1419a4227e14e64a5bc42814ffe"
+  "hash": "93fb404c9bb7a520edd240517e349f95c125cca4bde37b80d78b3d55fbba09bc"
 }
