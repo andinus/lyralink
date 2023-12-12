@@ -7,21 +7,10 @@ use std::net::SocketAddr;
 use tower_http::compression::CompressionLayer;
 use tower_http::services::ServeDir;
 
-mod handlers;
-mod utils;
-
-const DB_URL: &str = "sqlite://lyralink.db";
-const BASE_URL: &str = "https://ll.unfla.me";
+use lyralink::{handlers, DB_URL};
 
 #[tokio::main]
 async fn main() {
-    // create sqlite database if it doesn't exist.
-    if !Sqlite::database_exists(DB_URL).await.unwrap_or(false) {
-        Sqlite::create_database(DB_URL)
-            .await
-            .expect("create sqlite db");
-    }
-
     // connect to the database.
     let pool = SqlitePool::connect(DB_URL)
         .await

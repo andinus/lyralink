@@ -7,13 +7,28 @@ Demo: [[https://ll.unfla.me]]
 
 * Usage
 
-~lyralink~ is written in Rust. You must have ~cargo~ and ~sqlx-cli~ installed.
-Set ~DB_URL~ and ~BASE_URL~ in ~main.rs~ before proceeding.
+~lyralink~ is written in Rust. You must have ~cargo~ installed. Set ~DB_URL~ and
+~BASE_URL~ in ~lib.rs~ before proceeding.
 
-#+begin_src bash
-DATABASE_URL=sqlite://lyralink.db
-sqlx database create # create the database
-sqlx migrate run # run migrations
+Release creates two binaries: ~server~ & ~database-migrate~.
 
+#+begin_src sh
 cargo build --release # create a release build
+
+# install the binaries
+install -m 0700 target/release/server /home/lyralink/
+install -m 0700 target/release/database-migrate /home/lyralink/
+
+# run database migrations, start the server
+cd /home/lyralink && ./database-migrate && ./server
+#+end_src
+
+* Development
+
+After adding a migration, run:
+#+begin_src sh
+DATABASE_URL=sqlite://lyralink.db
+
+sqlx migrate run # run migrations
+cargo sqlx prepare # update `.sqlx' files
 #+end_src
