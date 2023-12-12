@@ -1,0 +1,19 @@
+#+title: lyralink
+#+subtitle: simple URL shortening service
+
+~lyralink~ is a simple URL shortening service.
+
+Demo: [[https://ll.unfla.me]]
+
+* Usage
+
+~lyralink~ is written in Rust. You must have ~cargo~ and ~sqlx-cli~ installed.
+Set ~DB_URL~ and ~BASE_URL~ in ~main.rs~ before proceeding.
+
+#+begin_src bash
+DATABASE_URL=sqlite://lyralink.db
+sqlx database create # create the database
+sqlx migrate run # run migrations
+
+cargo build --release # create a release build
+#+end_src
