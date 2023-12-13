@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT short_url, created_at FROM lyralink WHERE long_url = $1;",
+  "describe": {
+    "columns": [
+      {
+        "name": "short_url",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "created_at",
+        "ordinal": 1,
+        "type_info": "Datetime"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "3065a317889328a2e8fc41ac6ce0a17cff71b7866a3221bcd955d84915dc307b"
+}

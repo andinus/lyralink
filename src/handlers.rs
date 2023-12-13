@@ -5,6 +5,7 @@ use axum::{
     response::{Html, IntoResponse, Redirect, Response},
     Form,
 };
+use chrono::{Duration, DurationRound};
 use sqlx::Error::RowNotFound;
 
 use crate::utils::unique_short_url;
@@ -21,6 +22,8 @@ struct IndexTemplate {
 struct ResultTemplate {
     short_url: String,
     base_url: String,
+    original_url: String,
+    validity: String,
 }
 
 pub async fn index(State(AppState { base_url, .. }): State<AppState>) -> Html<String> {
@@ -41,14 +44,22 @@ pub async fn shorten(
     Form(form): Form<FormData>,
 ) -> Response {
     match unique_short_url(pool, &form.url).await {
-        Ok(short_url) => {
+        Ok((short_url, created_at)) => {
             if headers
                 .get(ACCEPT)
                 .map_or(false, |x| x.to_str().unwrap().contains("text/html"))
             {
+                // validity will be 1 day from when it's created.
+                let validity = (created_at + Duration::days(1))
+                    .duration_trunc(Duration::seconds(1))
+                    .unwrap()
+                    .to_string();
+
                 let page = ResultTemplate {
                     short_url,
                     base_url,
+                    validity,
+                    original_url: form.url,
                 };
                 Html(page.render().unwrap()).into_response()
             } else {

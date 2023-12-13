@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 
 {% block body %}
-<h1>lyralink - url shortener</h1>
-
-<a href="{{ base_url }}/{{ short_url }}">{{ base_url }}/{{ short_url }}</a>
+<ul>
+    <li>Original URL: {{ original_url }}</li>
+    <li>
+        Shortened URL: <a href="{{ base_url }}/{{ short_url }}">{{ base_url }}/{{ short_url }}</a>
+    </li>
+    <li>Valid until: {{ validity }}</li>
+</ul>
 {% endblock %}

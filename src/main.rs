@@ -1,16 +1,11 @@
-use axum::{
-    routing::{get, post},
-    Router,
-};
 use clap::Parser;
 use sqlx::{migrate::MigrateDatabase, Sqlite, SqlitePool};
-use std::net::SocketAddr;
-use std::str::FromStr;
-use tower_http::compression::CompressionLayer;
-use tower_http::services::ServeDir;
 
-pub mod handlers;
-pub mod utils;
+mod app;
+mod handlers;
+mod utils;
+
+use app::{app, AppState};
 
 /// Server for lyralink URL shortener
 #[derive(Parser, Debug)]
@@ -31,16 +26,6 @@ struct Args {
     /// Application's base URL
     #[arg(long, default_value = "https://ll.unfla.me")]
     base_url: String,
-}
-
-/// App state for routers.
-#[derive(Clone)]
-pub struct AppState {
-    /// Application's base URL
-    base_url: String,
-
-    /// Database pool
-    pool: SqlitePool,
 }
 
 #[tokio::main]
@@ -68,25 +53,15 @@ async fn main() {
         .await
         .unwrap_or_else(|_| panic!("running sqlx migrations: {}", args.database));
 
-    let app_state = AppState {
+    // bind to port and serve the app.
+    let listener = tokio::net::TcpListener::bind(&format!("{}:{}", args.address, args.port))
+        .await
+        .unwrap();
+    println!("listening on {}", listener.local_addr().unwrap());
+
+    let state = AppState {
         base_url: args.base_url,
         pool,
     };
-
-    // define routes & start axum server.
-    let app = Router::new()
-        .route("/", get(handlers::index))
-        .route("/", post(handlers::shorten))
-        .route("/:link", get(handlers::resolve))
-        .nest_service("/resources", ServeDir::new("resources/public"))
-        .layer(CompressionLayer::new())
-        .with_state(app_state);
-
-    let addr = SocketAddr::from_str(&format!("{}:{}", args.address, args.port)).unwrap();
-    println!("listening on {}", addr);
-
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+    axum::serve(listener, app(state)).await.unwrap();
 }

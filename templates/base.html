@@ -9,8 +9,23 @@
 
         <title>{% block title %}lyralink{% endblock %}</title>
         {% block head %}{% endblock %}
+        <style>
+            nav span {
+                font-weight: bold;
+            }
+        </style>
     </head>
     <body>
+        <header>
+            {% block navigation %}
+            <nav>
+                <span>lyralink</span>
+                <ul>
+                    <li><a href="{{ base_url }}">shorten links!</a></li>
+                </ul>
+            </nav>
+            {% endblock %}
+        </header>
         <main>
             {% block body %}{% endblock %}
         </main>
