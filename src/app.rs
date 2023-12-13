@@ -24,7 +24,7 @@ pub fn app(state: AppState) -> Router {
         .route("/", post(handlers::shorten))
         .route("/:link", get(handlers::resolve))
         .nest_service("/resources", ServeDir::new("resources/public"))
+        .fallback(handlers::not_found)
         .layer(CompressionLayer::new())
         .with_state(state)
-    // .fallback(handlers::404)
 }

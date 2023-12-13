@@ -18,6 +18,12 @@ struct IndexTemplate {
 }
 
 #[derive(Template)]
+#[template(path = "404.html")]
+struct NotFoundTemplate {
+    base_url: String,
+}
+
+#[derive(Template)]
 #[template(path = "result.html")]
 struct ResultTemplate {
     short_url: String,
@@ -26,8 +32,19 @@ struct ResultTemplate {
     validity: String,
 }
 
+#[derive(Template)]
+#[template(path = "result-invalid.html")]
+struct InvalidResultTemplate {
+    base_url: String,
+}
+
 pub async fn index(State(AppState { base_url, .. }): State<AppState>) -> Html<String> {
     let page = IndexTemplate { base_url };
+    Html(page.render().unwrap())
+}
+
+pub async fn not_found(State(AppState { base_url, .. }): State<AppState>) -> Html<String> {
+    let page = NotFoundTemplate { base_url };
     Html(page.render().unwrap())
 }
 
@@ -73,7 +90,8 @@ pub async fn shorten(
 /// Handles GET request to resolve a short url, client is redirected if we
 /// have the original url, if not then 404 is returned.
 pub async fn resolve(
-    State(AppState { pool, .. }): State<AppState>,
+    State(AppState { pool, base_url, .. }): State<AppState>,
+    headers: HeaderMap,
     Path(link): Path<String>,
 ) -> Response {
     // URLs are valid for 24 hours only.
@@ -82,7 +100,17 @@ pub async fn resolve(
         .await
     {
         Ok(row) => Redirect::to(&row.long_url).into_response(),
-        Err(RowNotFound) => StatusCode::NOT_FOUND.into_response(),
+        Err(RowNotFound) => {
+            if headers
+                .get(ACCEPT)
+                .map_or(false, |x| x.to_str().unwrap().contains("text/html"))
+            {
+                let page = InvalidResultTemplate { base_url };
+                (StatusCode::NOT_FOUND, Html(page.render().unwrap())).into_response()
+            } else {
+                StatusCode::NOT_FOUND.into_response()
+            }
+        }
         Err(err) => panic!("{}", err),
     }
 }
