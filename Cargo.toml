@@ -2,6 +2,11 @@
 name = "lyralink"
 version = "0.1.1"
 edition = "2021"
+authors = ["Andinus <andinus@nand.sh>"]
+description = "lyralink is a simple URL shortening service"
+repository = "https://github.com/andinus/lyralink"
+license = "ISC"
+rust-version = "1.70"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -14,6 +19,7 @@ serde = { version = "1.0.188", features = ["derive"] }
 tokio = { version = "1.32.0", features = ["full"] }
 sqlx = { version = "0.7", features = [ "runtime-tokio", "sqlite", "macros" ] }
 rand = "0.8.5"
+clap = { version = "4.4.11", features = ["derive"] }
 
 [profile.dev.package.askama_derive]
 opt-level = 3

@@ -5,22 +5,26 @@ use axum::{
     response::{Html, IntoResponse, Redirect, Response},
     Form,
 };
-use sqlx::{Error::RowNotFound, SqlitePool};
+use sqlx::Error::RowNotFound;
 
 use crate::utils::unique_short_url;
+use crate::AppState;
 
 #[derive(Template)]
 #[template(path = "index.html")]
-struct IndexTemplate;
+struct IndexTemplate {
+    base_url: String,
+}
 
 #[derive(Template)]
 #[template(path = "result.html")]
 struct ResultTemplate {
     short_url: String,
+    base_url: String,
 }
 
-pub async fn index() -> Html<String> {
-    let page = IndexTemplate;
+pub async fn index(State(AppState { base_url, .. }): State<AppState>) -> Html<String> {
+    let page = IndexTemplate { base_url };
     Html(page.render().unwrap())
 }
 
@@ -32,7 +36,7 @@ pub struct FormData {
 /// Handles POST request to create a new short url, it expects "url" in a
 /// formdata.
 pub async fn shorten(
-    State(pool): State<SqlitePool>,
+    State(AppState { pool, base_url, .. }): State<AppState>,
     headers: HeaderMap,
     Form(form): Form<FormData>,
 ) -> Response {
@@ -42,10 +46,13 @@ pub async fn shorten(
                 .get(ACCEPT)
                 .map_or(false, |x| x.to_str().unwrap().contains("text/html"))
             {
-                let page = ResultTemplate { short_url };
+                let page = ResultTemplate {
+                    short_url,
+                    base_url,
+                };
                 Html(page.render().unwrap()).into_response()
             } else {
-                format!("{}/{}\n", crate::BASE_URL, short_url).into_response()
+                format!("{}/{}\n", base_url, short_url).into_response()
             }
         }
         Err(err) => panic!("{}", err),
@@ -54,7 +61,10 @@ pub async fn shorten(
 
 /// Handles GET request to resolve a short url, client is redirected if we
 /// have the original url, if not then 404 is returned.
-pub async fn resolve(State(pool): State<SqlitePool>, Path(link): Path<String>) -> Response {
+pub async fn resolve(
+    State(AppState { pool, .. }): State<AppState>,
+    Path(link): Path<String>,
+) -> Response {
     // URLs are valid for 24 hours only.
     match sqlx::query!("SELECT long_url FROM lyralink WHERE short_url = $1;", link)
         .fetch_one(&pool)
