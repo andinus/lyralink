@@ -6,7 +6,7 @@ authors = ["Andinus <andinus@nand.sh>"]
 description = "lyralink is a simple URL shortening service"
 repository = "https://github.com/andinus/lyralink"
 license = "ISC"
-rust-version = "1.70"
+rust-version = "1.70.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
