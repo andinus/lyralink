@@ -20,9 +20,10 @@ cd lyralink && cargo build --release # create a release build
 * Development
 
 ~sqlx~ needs a database connection during compilation to perform compile time
-validation of SQL queries. To enable offline validation we need to run ~sqlx
-prepare~, it generates some files in ~.sqlx~ and that allows for offline
-compilation.
+validation of SQL queries.
+
+To enable offline validation, run ~cargo sqlx prepare~, it generates some files
+in ~.sqlx~ and that allows for offline compilation.
 
 After adding a migration or modifying SQL queries, run:
 #+begin_src sh
